@@ -2,20 +2,16 @@ import json
 import os
 from typing import Dict, List
 
+import yaml
 from openai import OpenAI
+
+# TODO: skip transcripts if already done
+# TODO: load variables at the top of the file
+# TODO: unit tests for all functions
 
 
 def list_files(directory_path: str, file_type: str = "txt") -> List[str]:
-    """
-    List all files of a specific type in the given directory.
-
-    Args:
-    directory_path (str): The path to the directory from which files are listed.
-    file_type (str): The type of files to list. Defaults to "txt".
-
-    Returns:
-    List[str]: A sorted list of file paths matching the given file type.
-    """
+    """List all files of a specific type in the given directory and sorts it by name."""
     if not os.path.isdir(directory_path):
         raise ValueError(f"Invalid directory path: {directory_path}")
 
@@ -28,6 +24,7 @@ def list_files(directory_path: str, file_type: str = "txt") -> List[str]:
     return sorted(files)
 
 
+# TODO: combine read/load functions
 def read_file_content(file_path: str) -> str:
     """Read and return the content of a file."""
     with open(file_path, "r", encoding="utf-8") as file:
@@ -40,56 +37,19 @@ def read_json_file(file_path: str) -> Dict:
         return json.load(file)
 
 
+def load_prompts(file_path):
+    with open(file_path, "r") as file:
+        prompts = yaml.safe_load(file)
+    return prompts
+
+
 def save_summary_as_json(content, file_path):
     """Save the summary as a JSON file."""
     with open(file_path, "w", encoding="utf-8") as f:
         json.dump(json.loads(content), f, ensure_ascii=False)
 
 
-def generate_summary(summary_schema: str, transcript: str, client: OpenAI) -> str:
-    """Generate a structured summary of the given transcript."""
-
-    system_prompt = "You are an AI practitioner and an expert in explaining concepts to a professional audience."
-
-    user_prompt = f"""
-    Objective:
-    Given the podcast episode transcript provided, generate a structured summary in JSON format. The summary should include the sections outlined in instructions, adhering strictly to the structure and examples provided in the output section. Always read all the relevant paragraphs before summarizing or identifying key passages.
-
-    Instructions:
-    1. Metadata: Include the title, date, and participants of the podcast.
-    2. Summary: A concise overview of the podcast transcript.
-    3. Topics: A list of the main topics of the discussion.
-    4. Quotes: A list of quotes that are exemplary of the discussion. Ensure these quotes are directly cited without paraphrasing, and include the name of the speaker for each quote.
-    5. Terms: Identify the key terms that are pivotal to understanding the discussion. Provide definitions for these terms.
-    6. Recommendations: A list of suggestions or advice given during the episode.
-    7. Conclusions: A summarizing statement that encapsulates the key outcomes or messages of the episode.
-
-    Output:
-    Ensure the information is formatted in JSON with the following schema:
-    {summary_schema}
-
-    Here is the transcript:
-    {transcript}
-    """
-    response = client.chat.completions.create(
-        model="gpt-3.5-turbo-0125",
-        response_format={"type": "json_object"},
-        messages=[
-            {
-                "role": "system",
-                "content": system_prompt,
-            },
-            {
-                "role": "user",
-                "content": user_prompt,
-            },
-        ],
-        temperature=0.5,
-        max_tokens=1000,
-    )
-    return response.choices[0].message.content
-
-
+# TODO: this is overkill, try to simplify (pick one/first term definition)
 def combine_terms(terms_dict, new_terms):
     for key, value in new_terms.items():
         if key in terms_dict:
@@ -98,33 +58,9 @@ def combine_terms(terms_dict, new_terms):
             terms_dict[key] = value
 
 
-def generate_final_summary(
-    summary_schema: str, combined_summary: str, client: OpenAI
-) -> str:
-    """Generate a final summary of the combined summaries."""
-
-    system_prompt = "You are an AI practitioner and an expert in explaining concepts to a professional audience."
-
-    user_prompt = f"""
-    Objective:
-    Given the podcast episode transcript provided, generate a structured summary in JSON format. The summary should include the sections outlined in instructions, adhering strictly to the structure and examples provided in the output section. Always read all the relevant paragraphs before summarizing or identifying key passages.
-
-    Instructions:
-    1. Metadata: Include the title, date, and participants of the podcast.
-    2. Summary: Summarize the summaries in a single comprehensive statement. Focus on the overarching themes.
-    3. Topics: List the five main topics discussed. Read all the topics before picking the five most important ones.
-    4. Quotes: Identify the three most important quotes. Read all the quotes before picking the three most important ones. Ensure these quotes are directly cited without paraphrasing, and include the name of the speaker for each quote.
-    5. Terms: Identify the key terms that are pivotal to understanding the discussion. Provide definitions for these terms. 
-    6. Recommendations: List the five most critical recommendations. 
-    7. Conclusions: Summarize the final conclusions in a single statement. This should reflect the implications of the discussion for future AI research and practices. 
-
-    Output:
-    Ensure the information is formatted in JSON with the following schema:
-    {summary_schema}
-
-    Here are the combined summaries:
-    {combined_summary}
-    """
+# TODO: parametrized model -> use GPT-4 in final summary
+def generate_summary(client: OpenAI, system_prompt: str, user_prompt: str) -> str:
+    """Generate a summary using the OpenAI API."""
 
     response = client.chat.completions.create(
         model="gpt-3.5-turbo-0125",
@@ -147,21 +83,28 @@ def generate_final_summary(
 
 if __name__ == "__main__":
     client = OpenAI()
-    summary_schema = read_json_file("summary_schema.json")
-    # 1. Process the individual transcripts
+    # TODO: load all configuration at the top of the file with a function
+    schema = read_file_content("summary_schema.json")
+    prompts = load_prompts("prompts.yml")
+    system_prompt = prompts["system_prompt"]
+    # 1. Process the individual transcripts -> TODO: needs to be a function
     transcript_file_paths = list_files("../data/transcripts/preprocessed")
     for fp in transcript_file_paths:
         # read transcripts
-        transcript = read_file_content(fp)
-
+        content = read_file_content(fp)
+        prompt_chunks = prompts["user_prompt_chunks"].format(
+            schema=schema, content=content
+        )
         # summarize the transcripts
-        summary = generate_summary(transcript, client)
+        summary = generate_summary(
+            client, system_prompt=system_prompt, user_prompt=prompt_chunks
+        )
         # save the transcripts as json
         file_name = os.path.basename(fp).replace(".txt", ".json")
         file_dir = "../data/summaries"
         save_summary_as_json(summary, os.path.join(file_dir, file_name))
 
-    # 2. Combine the summaries
+    # 2. Combine the summaries -> TODO: needs to be a function
     file_paths = list_files("../data/summaries", "json")
 
     combined_data = {
@@ -192,9 +135,13 @@ if __name__ == "__main__":
     with open("../data/summaries/combined_podcast_data.json", "w") as outfile:
         json.dump(combined_data, outfile, ensure_ascii=False, indent=4)
 
-    # 3. Generate the final summary
-    combined_json = read_json_file("../data/summaries/combined_podcast_data.json")
-
-    final_summary = generate_final_summary(combined_json, client)
+    # 3. Generate the final summary -> TODO: simplify
+    final_content = read_file_content("../data/summaries/combined_podcast_data.json")
+    user_prompt_final = prompts["user_prompt_final"].format(
+        schema=schema, content=final_content
+    )
+    final_summary = generate_summary(
+        client, system_prompt=system_prompt, user_prompt=user_prompt_final
+    )
 
     save_summary_as_json(final_summary, "../data/summaries/final_summary.json")
