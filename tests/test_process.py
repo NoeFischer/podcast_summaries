@@ -13,7 +13,7 @@ def test_list_files_with_various_files():
         mock_listdir.return_value = [
             "example.txt",
             "report.pdf",
-            "image.png",
+            "image.json",
             "notes.txt",
             "diagram.svg",
         ]
