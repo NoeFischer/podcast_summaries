@@ -14,7 +14,7 @@ user_prompt_chunks: |
   7. Conclusions: A summarizing statement that encapsulates the key outcomes or messages of the episode.
 
   Output:
-  Ensure the information is formatted in JSON based on the follow JSON schema:
+  Ensure the information is formatted in JSON based on the following JSON schema:
   {schema}
 
   Here is the transcript:
@@ -25,7 +25,7 @@ user_prompt_final: |
   Given the podcast episode transcript provided, generate a structured summary in JSON format. The summary should include the sections outlined in instructions, adhering strictly to the structure and examples provided in the output section. Always read all the relevant paragraphs before summarizing or identifying key passages.
 
   Instructions:
-  1. Metadata: Include the title, date, and participants of the podcast.
+  1. Metadata: Include the title, date (DD-MM-YYYY), and participants of the podcast.
   2. Summary: Summarize the summaries in a single comprehensive statement. Focus on the overarching themes.
   3. Topics: List the five main topics discussed. Read all the topics before picking the five most important ones.
   4. Quotes: Identify the three most important quotes. Read all the quotes before picking the three most important ones. Ensure these quotes are directly cited without paraphrasing, and include the name of the speaker for each quote.
@@ -34,7 +34,7 @@ user_prompt_final: |
   7. Conclusions: Summarize the final conclusions in a single statement. This should reflect the implications of the discussion for future AI research and practices. 
 
   Output:
-  Ensure the information is formatted in JSON based on the follow JSON schema:
+  Ensure the information is formatted in JSON based on the following JSON schema:
   {schema}
 
   Here are the transcripts:
