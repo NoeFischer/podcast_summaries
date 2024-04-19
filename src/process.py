@@ -7,14 +7,13 @@ import yaml
 from openai import OpenAI
 
 # TODO: unit tests for all functions
-# TODO: should i put the schema inside the system prompt?
 
 BASE_DATA_DIR = "../data"
 TRANSCRIPTS_DIR = os.path.join(BASE_DATA_DIR, "transcripts")
 SUMMARIES_DIR = os.path.join(BASE_DATA_DIR, "summaries")
 
 CHUNK_MODEL = "gpt-3.5-turbo-0125"
-FINAL_MODEL = "gpt-3.5-turbo-0125"
+FINAL_MODEL = "gpt-4-turbo"
 
 
 def list_files(directory_path: str, file_type: str = "txt") -> List[str]:
@@ -32,11 +31,9 @@ def list_files(directory_path: str, file_type: str = "txt") -> List[str]:
 def find_unsummarized_transcripts(
     transcripts_dir: str, summaries_dir: str
 ) -> List[str]:
-    # List all transcript and summary files
     transcript_files = list_files(transcripts_dir, "txt")
     summary_files = list_files(summaries_dir, "json")
 
-    # Extract the base names without extensions for comparison
     transcript_base_names = set(
         os.path.splitext(os.path.basename(file))[0] for file in transcript_files
     )
@@ -44,10 +41,8 @@ def find_unsummarized_transcripts(
         os.path.splitext(os.path.basename(file))[0] for file in summary_files
     )
 
-    # Find transcripts that do not have corresponding summaries
     untranslated = transcript_base_names - summary_base_names
 
-    # Create a list of paths for transcripts without summaries
     untranslated_paths = [
         os.path.join(transcripts_dir, base_name + ".txt") for base_name in untranslated
     ]
@@ -128,11 +123,6 @@ def generate_summary(
     return response.choices[0].message.content
 
 
-def generate_prompt(prompt_template: str, schema: dict, content: str) -> str:
-    """gens a prompt using the provided schema and content."""
-    return prompt_template.format(schema=schema, content=content)
-
-
 def combine_summaries(chunk_summaries: List[Dict[str, Any]]) -> Dict[str, Any]:
     """Combines summaries from multiple chunks into a single summary file."""
     combined_sum = chunk_summaries[0]
@@ -163,47 +153,41 @@ def combine_summaries(chunk_summaries: List[Dict[str, Any]]) -> Dict[str, Any]:
     return combined_sum
 
 
-###############################################################################
+######################### RUN SCRIPT ######################################
 
 schema, prompts = load_config("sum_schema.json", "prompts.yml")
-system_prompt = prompts["system_prompt"]
+system_prompt = prompts["system_prompt"].format(schema=schema)
 client = OpenAI()
 
-# 0. Find transcripts that need to be summarized
+
 untranslated_paths = find_unsummarized_transcripts(TRANSCRIPTS_DIR, SUMMARIES_DIR)
 
-# Check if there are any transcripts to summarize
 if not untranslated_paths:
     print("No transcripts to summarize.")
 else:
     for transcript_path in untranslated_paths:
-        # 1. Load transcript and split into chunks
         transcript = read_text(transcript_path)
         chunks = split_transcript(transcript)
 
-        # 2. Summarize the chunks
         chunk_summaries = []
         for chunk in chunks:
-            chunk_prompt = generate_prompt(prompts["user_prompt_chunks"], schema, chunk)
+            chunk_prompt = prompts["user_prompt_chunks"].format(content=chunk)
             chunk_sum = generate_summary(
                 client, system_prompt, chunk_prompt, CHUNK_MODEL
             )
             chunk_sum_dict = json.loads(chunk_sum)
             chunk_summaries.append(chunk_sum_dict)
-
-        # 3. Combine the summaries
         combined_summaries = combine_summaries(chunk_summaries)
-
-        # 4. Generate the final summary
-        combined_summaries_txt = json.dumps(combined_summaries)
-        user_prompt_final = generate_prompt(
-            prompts["user_prompt_final"], schema, combined_summaries_txt
+        combined_summaries_txt = json.dumps(
+            combined_summaries, ensure_ascii=False, indent=4
+        )
+        user_prompt_final = prompts["user_prompt_final"].format(
+            content=combined_summaries_txt
         )
         final_sum = generate_summary(
             client, system_prompt, user_prompt_final, FINAL_MODEL
         )
         final_sum_dict = json.loads(final_sum)
-
         summary_path = os.path.join(
             SUMMARIES_DIR, os.path.basename(transcript_path).replace(".txt", ".json")
         )

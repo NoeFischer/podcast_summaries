@@ -1,8 +1,10 @@
-system_prompt: "You are an AI practitioner and an expert in explaining concepts to a professional audience."
+system_prompt: | 
+  You are an AI practitioner and an expert in explaining concepts to a professional audience. Ensure the information is formatted in JSON based on the following JSON schema:
+  {schema}
 
 user_prompt_chunks: |
   Objective:
-  Given the podcast episode transcript provided, generate a structured summary in JSON format. The summary should include the sections outlined in instructions, adhering strictly to the structure and examples provided in the output section. Always read all the relevant paragraphs before summarizing or identifying key passages.
+  Given the podcast episode transcript provided, generate a structured summary in JSON format. The summary should include the sections outlined in instructions, adhering strictly to the structure and examples provided. Always read all the relevant paragraphs before summarizing or identifying key passages.
 
   Instructions:
   1. Metadata: Include the title, date (DD-MM-YYYY), and participants of the podcast.
@@ -13,16 +15,12 @@ user_prompt_chunks: |
   6. Recommendations: A list of suggestions or advice given during the episode.
   7. Conclusions: A summarizing statement that encapsulates the key outcomes or messages of the episode.
 
-  Output:
-  Ensure the information is formatted in JSON based on the following JSON schema:
-  {schema}
-
   Here is the transcript:
   {content}
 
 user_prompt_final: |
   Objective:
-  Given the podcast episode transcript provided, generate a structured summary in JSON format. The summary should include the sections outlined in instructions, adhering strictly to the structure and examples provided in the output section. Always read all the relevant paragraphs before summarizing or identifying key passages.
+  Given the podcast episode transcript provided, generate a structured summary in JSON format. The summary should include the sections outlined in instructions, adhering strictly to the structure and examples provided. Always read all the relevant paragraphs before summarizing or identifying key passages.
 
   Instructions:
   1. Metadata: Include the title, date (DD-MM-YYYY), and participants of the podcast.
@@ -32,10 +30,6 @@ user_prompt_final: |
   5. Terms: Identify the key terms that are pivotal to understanding the discussion. Provide definitions for these terms. 
   6. Recommendations: List the five most critical recommendations. 
   7. Conclusions: Summarize the final conclusions in a single statement. This should reflect the implications of the discussion for future AI research and practices. 
-
-  Output:
-  Ensure the information is formatted in JSON based on the following JSON schema:
-  {schema}
 
   Here are the transcripts:
   {content}
