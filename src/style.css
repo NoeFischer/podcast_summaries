@@ -60,6 +60,22 @@
 }
 
 .term-definition {
-    color: #7f8c8d;
+    color: #6d7879;
     font-size: 14px;
+}
+
+.recommendation-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.recommendation-list li {
+    background-color: #f7f7f7;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.recommendation-list li:hover {
+    background-color: #eee;
 }

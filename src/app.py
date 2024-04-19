@@ -42,6 +42,12 @@ def create_html(content, content_type):
             + "".join(f"<li>{rec}</li>" for rec in content)
             + "</ul>"
         )
+    elif content_type == "recommendations":
+        return (
+            '<div class="recommendation-container">'
+            + "".join(f'<div class="recommendation">{rec}</div>' for rec in content)
+            + "</div>"
+        )
     elif content_type == "glossary":
         term, definition = content
         search_query = "+".join(term.split())
@@ -73,13 +79,21 @@ def main():
     directory = "../data/summaries/"
     podcast_names = get_podcast_names(directory)
 
-    selected_podcast = st.session_state.get(
-        "selected_podcast", podcast_names[0] if podcast_names else None
+    # Get the selected podcast from the dropdown
+    if (
+        "selected_podcast" not in st.session_state
+        or st.session_state["selected_podcast"] not in podcast_names
+    ):
+        st.session_state["selected_podcast"] = (
+            podcast_names[0] if podcast_names else None
+        )
+
+    selected_podcast = st.selectbox(
+        "Choose a Podcast",
+        podcast_names,
+        index=podcast_names.index(st.session_state["selected_podcast"]),
     )
-    for podcast in podcast_names:
-        if st.button(podcast):
-            selected_podcast = podcast
-            st.session_state["selected_podcast"] = podcast
+    st.session_state["selected_podcast"] = selected_podcast
 
     summaries = load_data(directory, selected_podcast)
     selected_title = st.selectbox("Select an Episode", list(summaries.keys()))
@@ -99,6 +113,7 @@ def main():
     st.markdown(
         '<h3 class="custom-subheader">Recommendations</h3>', unsafe_allow_html=True
     )
+
     st.markdown(
         create_html(data["recommendations"], "recommendations"), unsafe_allow_html=True
     )
