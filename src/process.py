@@ -6,8 +6,6 @@ from typing import Any, Dict, List, Tuple
 import yaml
 from openai import OpenAI
 
-# TODO: add preprocessing step here
-# TODO: skip transcripts if already summarized
 # TODO: unit tests for all functions
 # TODO: should i put the schema inside the system prompt?
 
@@ -29,6 +27,32 @@ def list_files(directory_path: str, file_type: str = "txt") -> List[str]:
         if file.endswith(f".{file_type}")
     ]
     return sorted(files)
+
+
+def find_unsummarized_transcripts(
+    transcripts_dir: str, summaries_dir: str
+) -> List[str]:
+    # List all transcript and summary files
+    transcript_files = list_files(transcripts_dir, "txt")
+    summary_files = list_files(summaries_dir, "json")
+
+    # Extract the base names without extensions for comparison
+    transcript_base_names = set(
+        os.path.splitext(os.path.basename(file))[0] for file in transcript_files
+    )
+    summary_base_names = set(
+        os.path.splitext(os.path.basename(file))[0] for file in summary_files
+    )
+
+    # Find transcripts that do not have corresponding summaries
+    untranslated = transcript_base_names - summary_base_names
+
+    # Create a list of paths for transcripts without summaries
+    untranslated_paths = [
+        os.path.join(transcripts_dir, base_name + ".txt") for base_name in untranslated
+    ]
+
+    return untranslated_paths
 
 
 def load_json(file_path: str):
@@ -145,32 +169,43 @@ schema, prompts = load_config("sum_schema.json", "prompts.yml")
 system_prompt = prompts["system_prompt"]
 client = OpenAI()
 
-# 1. Load transcript and split into chunks
-transcript = read_text(os.path.join(TRANSCRIPTS_DIR, "dwarkesh_podcast_180424.txt"))
-chunks = split_transcript(transcript)
+# 0. Find transcripts that need to be summarized
+untranslated_paths = find_unsummarized_transcripts(TRANSCRIPTS_DIR, SUMMARIES_DIR)
 
-# 2. Summarize the chunks
-chunk_summaries = []
+# Check if there are any transcripts to summarize
+if not untranslated_paths:
+    print("No transcripts to summarize.")
+else:
+    for transcript_path in untranslated_paths:
+        # 1. Load transcript and split into chunks
+        transcript = read_text(transcript_path)
+        chunks = split_transcript(transcript)
 
-# TODO: validate the json/dict structure of the summaries
-for chunk in chunks:
-    chunk_prompt = generate_prompt(prompts["user_prompt_chunks"], schema, chunk)
-    chunk_sum = generate_summary(client, system_prompt, chunk_prompt, CHUNK_MODEL)
-    chunk_sum_dict = json.loads(chunk_sum)
-    chunk_summaries.append(chunk_sum_dict)
+        # 2. Summarize the chunks
+        chunk_summaries = []
+        for chunk in chunks:
+            chunk_prompt = generate_prompt(prompts["user_prompt_chunks"], schema, chunk)
+            chunk_sum = generate_summary(
+                client, system_prompt, chunk_prompt, CHUNK_MODEL
+            )
+            chunk_sum_dict = json.loads(chunk_sum)
+            chunk_summaries.append(chunk_sum_dict)
 
-# 3. Combine the summaries
-combined_summaries = combine_summaries(chunk_summaries)
+        # 3. Combine the summaries
+        combined_summaries = combine_summaries(chunk_summaries)
 
-# 4. Generate the final summary
-combined_summaries_txt = json.dumps(combined_summaries)
+        # 4. Generate the final summary
+        combined_summaries_txt = json.dumps(combined_summaries)
+        user_prompt_final = generate_prompt(
+            prompts["user_prompt_final"], schema, combined_summaries_txt
+        )
+        final_sum = generate_summary(
+            client, system_prompt, user_prompt_final, FINAL_MODEL
+        )
+        final_sum_dict = json.loads(final_sum)
 
-user_prompt_final = generate_prompt(
-    prompts["user_prompt_final"], schema, combined_summaries_txt
-)
-
-final_sum = generate_summary(client, system_prompt, user_prompt_final, FINAL_MODEL)
-
-final_sum_dict = json.loads(final_sum)
-
-write_json(final_sum_dict, "../data/summaries/final_sum.json")
+        summary_path = os.path.join(
+            SUMMARIES_DIR, os.path.basename(transcript_path).replace(".txt", ".json")
+        )
+        write_json(final_sum_dict, summary_path)
+        print(f"Summary saved to {summary_path}")
