@@ -52,7 +52,7 @@ def read_text(file_path: str) -> str:
 
 def load_config(schema_path: str, prompts_path: str) -> Tuple[Any, Any]:
     """Load configuration files for the schema and prompts."""
-    schema = load_json("summary_schema.json")
+    schema = read_text("summary_schema.json")
     prompts = load_yaml("prompts.yml")
     return schema, prompts
 
@@ -125,11 +125,13 @@ client = OpenAI()
 # 1. Summarize the chunks
 chunk_summaries = []
 
+# TODO: validate the json/dict structure of the summaries
 for chunk_path in list_files(os.path.join(TRANSCRIPTS_DIR, "preprocessed"), "txt"):
     chunk = read_text(chunk_path)
     chunk_prompt = generate_prompt(prompts["user_prompt_chunks"], schema, chunk)
     chunk_sum = generate_summary(client, system_prompt, chunk_prompt, CHUNK_MODEL)
     chunk_sum_dict = json.loads(chunk_sum)
+    print(f"File: {chunk_path} \n", chunk_sum_dict)
     chunk_summaries.append(chunk_sum_dict)
 
 # 2. Combine the summaries
@@ -146,4 +148,4 @@ final_sum = generate_summary(client, system_prompt, user_prompt_final, FINAL_MOD
 
 final_sum_dict = json.loads(final_sum)
 
-write_json(final_sum, "../data/summaries/final_sum.json")
+write_json(final_sum_dict, "../data/summaries/final_sum.json")
