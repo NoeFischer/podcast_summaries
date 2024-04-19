@@ -1,14 +1,15 @@
 import json
+import math
 import os
 from typing import Any, Dict, List, Tuple
 
 import yaml
 from openai import OpenAI
 
+# TODO: add preprocessing step here
 # TODO: skip transcripts if already summarized
 # TODO: unit tests for all functions
 # TODO: should i put the schema inside the system prompt?
-# TODO: eliminate all read steps (except the first one) -> don't store intermediary results
 
 BASE_DATA_DIR = "../data"
 TRANSCRIPTS_DIR = os.path.join(BASE_DATA_DIR, "transcripts")
@@ -22,13 +23,11 @@ def list_files(directory_path: str, file_type: str = "txt") -> List[str]:
     """Retrieve and return a sorted list of filenames in a specified directory that match a given file extension."""
     if not os.path.isdir(directory_path):
         raise ValueError(f"Invalid directory path: {directory_path}")
-
     files = [
         os.path.join(directory_path, file)
         for file in os.listdir(directory_path)
         if file.endswith(f".{file_type}")
     ]
-
     return sorted(files)
 
 
@@ -50,17 +49,42 @@ def read_text(file_path: str) -> str:
         return file.read()
 
 
+def write_json(content: Any, file_path: str):
+    """Writes the provided content to a JSON file at the specified file path."""
+    with open(file_path, "w", encoding="utf-8") as f:
+        json.dump(content, f, ensure_ascii=False, indent=4)
+
+
+def balance_splits(transcript, estimated_parts):
+    """Adjust split points to balance transcript across parts."""
+    part_starts = [0]
+    step_size = len(transcript) // estimated_parts
+    for i in range(1, estimated_parts):
+        part_end_index = part_starts[-1] + step_size
+        part_end = (
+            transcript.find("\n", part_end_index) + 1
+            if "\n" in transcript[part_end_index:]
+            else len(transcript)
+        )
+        part_starts.append(part_end)
+    part_starts.append(len(transcript))
+    return part_starts
+
+
+def split_transcript(transcript, max_chars=56000):
+    """Split the transcript into chunks, balancing them more evenly."""
+    estimated_parts = math.ceil(len(transcript) / max_chars)
+    part_starts = balance_splits(transcript, estimated_parts)
+    return [
+        transcript[start:end] for start, end in zip(part_starts[:-1], part_starts[1:])
+    ]
+
+
 def load_config(schema_path: str, prompts_path: str) -> Tuple[Any, Any]:
     """Load configuration files for the schema and prompts."""
     schema = read_text("summary_schema.json")
     prompts = load_yaml("prompts.yml")
     return schema, prompts
-
-
-def write_json(content: Any, file_path: str):
-    """Writes the provided content to a JSON file at the specified file path."""
-    with open(file_path, "w", encoding="utf-8") as f:
-        json.dump(content, f, ensure_ascii=False, indent=4)
 
 
 def generate_summary(
@@ -117,27 +141,28 @@ def combine_summaries(chunk_summaries: List[Dict[str, Any]]) -> Dict[str, Any]:
 
 ###############################################################################
 
-# Load the schema and prompts
 schema, prompts = load_config("sum_schema.json", "prompts.yml")
 system_prompt = prompts["system_prompt"]
 client = OpenAI()
 
-# 1. Summarize the chunks
+# 1. Load transcript and split into chunks
+transcript = read_text(os.path.join(TRANSCRIPTS_DIR, "dwarkesh_podcast_180424.txt"))
+chunks = split_transcript(transcript)
+
+# 2. Summarize the chunks
 chunk_summaries = []
 
 # TODO: validate the json/dict structure of the summaries
-for chunk_path in list_files(os.path.join(TRANSCRIPTS_DIR, "preprocessed"), "txt"):
-    chunk = read_text(chunk_path)
+for chunk in chunks:
     chunk_prompt = generate_prompt(prompts["user_prompt_chunks"], schema, chunk)
     chunk_sum = generate_summary(client, system_prompt, chunk_prompt, CHUNK_MODEL)
     chunk_sum_dict = json.loads(chunk_sum)
-    print(f"File: {chunk_path} \n", chunk_sum_dict)
     chunk_summaries.append(chunk_sum_dict)
 
-# 2. Combine the summaries
+# 3. Combine the summaries
 combined_summaries = combine_summaries(chunk_summaries)
 
-# 3. Generate the final summary
+# 4. Generate the final summary
 combined_summaries_txt = json.dumps(combined_summaries)
 
 user_prompt_final = generate_prompt(
