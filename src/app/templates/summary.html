@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>AI Podcast Summaries</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+
+<body>
+    <div>
+        <h1>AI Podcast Summaries</h1>
+        <div>
+            <div>
+                <h2>{{ data.metadata.title }}</h2>
+                <p>
+                    {{ data.metadata.date }} |
+                    {% for participant in data.metadata.participants %}
+                    {{ participant }}{% if not loop.last %} • {% endif %}
+                    {% endfor %}
+                </p>
+                <ul>
+                    {% for topic in data.topics %}
+                    <li>{{ topic }}</li>
+                    {% endfor %}
+                </ul>
+                <p>{{ data.summary }}</p>
+                <h3>Quotes</h3>
+                {% for quote in data.quotes %}
+                <blockquote>
+                    <p>{{ quote.quote }}</p>
+                    <footer>{{ quote.speaker }}</footer>
+                </blockquote>
+                {% endfor %}
+                <h3>Terms</h3>
+                <table>
+                    <thead>
+                    </thead>
+                    <tbody>
+                        {% for term, definition in data.terms.items() %}
+                        <tr>
+                            <th scope="row">{{ term }}</th>
+                            <td>{{ definition }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <h3>Recommendations</h3>
+                <ul>
+                    {% for recommendation in data.recommendations %}
+                    <li>{{ recommendation }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

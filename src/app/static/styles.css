@@ -1,0 +1,108 @@
+/* Reset some default browser margins and paddings */
+body, h1, h2, h3, p, ul, li {
+    margin: 0;
+    padding: 0;
+}
+
+/* Apply a consistent box-sizing model */
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+/* Base styles */
+body {
+    font-family: Arial, sans-serif; /* Use a more specific font-family */
+    color: #333;
+    background-color: #fff; /* Set a background color for consistency */
+    line-height: 1.6;
+}
+
+a {
+    color: #333;
+    text-decoration: none;
+}
+
+a:hover {
+    color: #555;
+}
+
+/* Layout styles */
+header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #f0f0f0;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.header-brand a {
+    font-weight: bold;
+    font-size: 30px;
+}
+
+main {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* Form and navigation styles */
+nav form {
+    display: flex;
+    gap: 10px; /* Adds space between elements in the form */
+}
+
+input[type="text"], select {
+    padding: 5px 10px;
+    font-size: 16px;
+}
+
+button {
+    padding: 5px 15px;
+    background-color: #f0f0f0;
+    border: none;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #e0e0e0;
+}
+
+/* Content styles */
+article {
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+article h2 {
+    font-size: 24px;
+    margin-bottom: 5px;
+}
+
+.subtitle {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 5px;
+}
+
+.tags {
+    margin-bottom: 10px;
+}
+
+.tag {
+    display: inline-block;
+    background-color: #f0f0f0;
+    color: #333;
+    font-size: 12px;
+    padding: 5px 10px;
+    margin-right: 5px;
+    margin-bottom: 5px;
+}
+
+.tags::after {
+    content: "";
+    display: table;
+    clear: both;
+}

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Podcast Summaries</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='styles.css' ) }}"
+    />
+  </head>
+
+  <body>
+    <header>
+      <div class="header-brand">
+        <a href="{{ url_for('index') }}">AI Podcast Summaries</a>
+      </div>
+      <nav>
+        <form action="{{ url_for('index') }}" method="get">
+          <input type="text" name="query" placeholder="Search episodes..." />
+          <select name="podcast" id="podcastSelect">
+            <option value="">All Podcasts</option>
+            {% for podcast in podcast_names %}
+            <option value="{{ podcast }}">{{ podcast }}</option>
+            {% endfor %}
+          </select>
+          <button type="submit">Search</button>
+        </form>
+      </nav>
+    </header>
+
+    <main>
+      <section id="summaries">
+        {% for sum in summaries %}
+        <article>
+          <h2>
+            <a href="{{ url_for('summary', summary_id=sum.metadata.id) }}"
+              >{{ sum.metadata.title }}</a
+            >
+          </h2>
+          <p class="subtitle">
+            Date: {{ sum.metadata.date }} | {{ sum.metadata.participants |
+            join(' • ') }}
+          </p>
+          <div class="tags">
+            {% for topic in sum.topics %}
+            <span class="tag">{{ topic }}</span>
+            {% endfor %}
+          </div>
+          <p>{{ sum.conclusions }}</p>
+        </article>
+        {% endfor %}
+      </section>
+    </main>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+  </body>
+</html>
