@@ -1,163 +1,59 @@
-/* Reset some default browser margins and paddings */
-body, h1, h2, h3, p, ul, li {
-    margin: 0;
-    padding: 0;
+:root {
+    --primary: #153448; /* Primary color for the theme */
+    --secondary: #1f2d3d; /* Secondary color for the theme */
+    --light: #ffffff; /* Light color for contrast */
+    --hover: #DFD0B8; /* Hover color for links */
+  }
+
+.navbar {
+    background-color: var(--primary); /* Use the primary color for the background */
+    padding: 0.5rem 1rem; /* Adjust the padding for better spacing */
+    border-bottom: 1px solid var(--light); /* Add a light border at the bottom */
+  }
+
+/* Navbar brand styling */
+.navbar-brand {
+    font-weight: 500; /* Bold weight for the brand */
+    font-size: 1.7rem; /* Larger font size for visibility */
+    color: var(--light); /* Light color for contrast */
+    transition: color 0.2s ease-in-out; /* Smooth transition for hover effects */
+  }
+
+.navbar-brand:hover {
+    color:var(--hover); /* Lighter shade when hovered */
+  }
+
+/* Navigation link styling */
+.nav-link {
+    color: #dee2e6; /* Soft white color for the links */
+    font-size: 1.1rem;
+    transition: color 0.2s ease-in-out; /* Smooth transition for hover effects */
+  }
+
+.nav-link:hover {
+color: var(--hover); /* A lighter grey when hovered */
 }
 
-/* Apply a consistent box-sizing model */
-*, *::before, *::after {
-    box-sizing: border-box;
+.bg-primary {
+    background-color: var(--primary) !important; /* A dark gray background */
+  }  
+
+
+.text-primary {
+    color: var(--primary) !important; 
+  }
+
+p {
+margin-bottom: 0.5rem;
 }
 
-/* Base styles */
-body {
-    font-family: Arial, sans-serif; /* Use a more specific font-family */
-    color: #333;
-    background-color: #fff; /* Set a background color for consistency */
-    line-height: 1.6;
-}
+.btn-outline-primary {
+    color: #ffffff;
+    border-color: #ffffff;
+  }
 
-a {
-    color: #333;
-    text-decoration: none;
-}
-
-a:hover {
-    color: #555;
-}
-
-/* Layout styles */
-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background-color: #f0f0f0;
-    padding: 20px;
-    margin-bottom: 20px;
-    height: 80px; /* Set an explicit height */
-}
-
-.header-brand, .header-brand h1 {
-    font-size: 24px;
-    margin: 0; /* Ensure no extra space from default margins */
-    line-height: 1.2; /* Adjust line height to fill header appropriately */
-}
-
-.header-brand a {
-    font-weight: bold;
-    font-size: 24px;
-}
-
-main {
-    max-width: 960px;
-    margin: 0 auto;
-    padding: 0 20px;
-}
-
-/* Form and navigation styles */
-nav form {
-    display: flex;
-    gap: 10px; /* Adds space between elements in the form */
-}
-
-nav a, nav form {
-    font-size: 16px;
-    line-height: 1.2;
-}
-
-input[type="text"], select {
-    padding: 5px 10px;
-    font-size: 16px;
-    height: 30px;
-}
-
-button {
-    padding: 5px 15px;
-    background-color: #f0f0f0;
-    border: none;
-    cursor: pointer;
-    height: 30px;
-}
-
-button:hover {
-    background-color: #e0e0e0;
-}
-
-/* Content styles */
-article {
-    border-bottom: 1px solid #eee;
-    padding-bottom: 10px;
-    margin-bottom: 20px;
-}
-
-article section {
-    margin-bottom: 10px;
-}
-
-article h2 {
-    font-size: 24px;
-    margin-bottom: 2px;
-}
-
-.subtitle {
-    font-size: 14px;
-    color: #666;
-    margin-bottom: 7px;
-}
-
-.tags {
-    margin-bottom: 10px;
-}
-
-.tag {
-    display: inline-block;
-    background-color: #faf9f9;
-    color: #333;
-    font-size: 12px;
-    padding: 5px 10px;
-    margin-right: 5px;
-    margin-bottom: 5px;
-}
-
-.tags::after {
-    content: "";
-    display: table;
-    clear: both;
-}
-
-.quote-carousel {
-    position: relative;
-    width: 80%;
-    margin: auto;
-    overflow: hidden;
-}
-
-.quotes-slider {
-    display: flex;
-    transition: transform 0.5s ease;
-}
-
-.quote-slide {
-    min-width: 100%;
-    box-sizing: border-box;
-    padding: 20px;
-    text-align: center;
-}
-
-.prev, .next {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    background-color: #ddd;
-    border: none;
-    padding: 10px;
-    cursor: pointer;
-}
-
-.prev {
-    left: 10px;
-}
-
-.next {
-    right: 10px;
+.btn-outline-primary:hover {
+background-color: var(--hover);
+color: #ffffff;
+border-color: #ffffff;
 }

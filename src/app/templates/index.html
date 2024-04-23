@@ -2,61 +2,73 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>AI Podcast Summaries</title>
     <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
       rel="stylesheet"
-      href="{{ url_for('static', filename='styles.css' ) }}"
     />
     <link
-      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Merriweather:wght@400;700&display=swap"
       rel="stylesheet"
+      href="{{ url_for('static', filename='styles.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css"
     />
   </head>
 
   <body>
     <header>
-      <div class="header-brand">
-        <a href="{{ url_for('index') }}">AI Podcast Summaries</a>
-      </div>
-      <nav>
-        <form action="{{ url_for('index') }}" method="get">
-          <input type="text" name="query" placeholder="Search episodes..." />
-          <select name="podcast" id="podcastSelect">
-            <option value="">All Podcasts</option>
-            {% for podcast in podcast_names %}
-            <option value="{{ podcast }}">{{ podcast }}</option>
-            {% endfor %}
-          </select>
-          <button type="submit">Search</button>
-        </form>
+      <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
+          <a class="navbar-brand" href="{{ url_for('index') }}"
+            >AI Podcast Summaries</a
+          >
+          <form class="d-flex" action="{{ url_for('index') }}" method="get">
+            <input
+              type="text"
+              name="query"
+              class="form-control me-2"
+              placeholder="Search episodes..."
+            />
+            <select name="podcast" id="podcastSelect" class="form-select me-2">
+              <option value="">All Shows</option>
+              {% for podcast in podcast_names %}
+              <option value="{{ podcast }}">{{ podcast }}</option>
+              {% endfor %}
+            </select>
+            <button type="submit" class="btn btn-outline-primary me-2">
+              <i class="bi bi-search"></i>
+            </button>
+          </form>
+        </div>
       </nav>
     </header>
 
-    <main>
-      <section id="summaries">
-        {% for sum in summaries %}
-        <article>
-          <section class="episode-info">
-            <h2>
-              <a href="{{ url_for('summary', summary_id=sum.metadata.id) }}"
-                >{{ sum.metadata.title }}</a
-              >
-            </h2>
-            <p class="subtitle">
-              Date: {{ sum.metadata.date }} | {{ sum.metadata.participants |
-              join(' • ') }}
-            </p>
-          </section>
-          <section class="tags">
-            {% for topic in sum.topics %}
-            <span class="tag">{{ topic }}</span>
-            {% endfor %}
-          </section>
-          <section><p>{{ sum.conclusions }}</p></section>
-        </article>
-        {% endfor %}
-      </section>
+    <main class="container mt-4">
+      {% for sum in summaries %}
+      <article>
+        <section class="mb-3">
+          <h2 class="mb-1">
+            <a
+              class="text-decoration-none text-primary"
+              href="{{ url_for('summary', summary_id=sum.metadata.id) }}"
+              >{{ sum.metadata.title }}</a
+            >
+          </h2>
+          <p class="text-muted mb-2">
+            {{ sum.metadata.date }} | {% for participant in
+            sum.metadata.participants %} {{ participant }}{% if not loop.last %}
+            • {% endif %} {% endfor %}
+          </p>
+          {% for topic in sum.topics %}
+          <span class="badge bg-primary">{{ topic }}</span>
+          {% endfor %}
+        </section>
+        <section class="mb-4"><p>{{ sum.conclusions }}</p></section>
+      </article>
+      {% endfor %}
     </main>
     <script src="{{ url_for('static', filename='script.js') }}"></script>
   </body>
