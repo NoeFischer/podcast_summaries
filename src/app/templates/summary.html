@@ -1,60 +1,75 @@
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>AI Podcast Summaries - {{ data.metadata.title }}</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='styles.css') }}"
+    />
+  </head>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>AI Podcast Summaries</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-</head>
-
-<body>
-    <div>
-        <h1>AI Podcast Summaries</h1>
-        <div>
-            <div>
-                <h2>{{ data.metadata.title }}</h2>
-                <p>
-                    {{ data.metadata.date }} |
-                    {% for participant in data.metadata.participants %}
-                    {{ participant }}{% if not loop.last %} • {% endif %}
-                    {% endfor %}
-                </p>
-                <ul>
-                    {% for topic in data.topics %}
-                    <li>{{ topic }}</li>
-                    {% endfor %}
-                </ul>
-                <p>{{ data.summary }}</p>
-                <h3>Quotes</h3>
-                {% for quote in data.quotes %}
-                <blockquote>
-                    <p>{{ quote.quote }}</p>
-                    <footer>{{ quote.speaker }}</footer>
-                </blockquote>
-                {% endfor %}
-                <h3>Terms</h3>
-                <table>
-                    <thead>
-                    </thead>
-                    <tbody>
-                        {% for term, definition in data.terms.items() %}
-                        <tr>
-                            <th scope="row">{{ term }}</th>
-                            <td>{{ definition }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-                <h3>Recommendations</h3>
-                <ul>
-                    {% for recommendation in data.recommendations %}
-                    <li>{{ recommendation }}</li>
-                    {% endfor %}
-                </ul>
-            </div>
-        </div>
-    </div>
-</body>
-
+  <body>
+    <header>
+      <h1 class="header-brand">
+        <a href="{{ url_for('index') }}">AI Podcast Summaries</a>
+      </h1>
+      <nav>
+        <a href="{{ url_for('index') }}">Back to List</a>
+      </nav>
+    </header>
+    <main>
+      <article>
+        <section class="episode-info">
+          <h2>{{ data.metadata.title }}</h2>
+          <p class="subtitle">
+            {{ data.metadata.date }} | {% for participant in
+            data.metadata.participants %} {{ participant }}{% if not loop.last
+            %} • {% endif %} {% endfor %}
+          </p>
+        </section>
+        <section class="tags">
+          {% for topic in data.topics %}
+          <span class="tag">{{ topic }}</span>
+          {% endfor %}
+        </section>
+        <section class="summary">
+          <h3>Summary</h3>
+          <p>{{ data.summary }}</p>
+        </section>
+        <section class="quotes">
+          <div class="quote-container">
+            {% for quote in data.quotes %}
+            <blockquote>
+              <p>{{ quote.quote }}</p>
+              <footer>{{ quote.speaker }}</footer>
+            </blockquote>
+            {% endfor %}
+          </div>
+        </section>
+        <section class="terms">
+          <h3>Terms</h3>
+          <table>
+            <tbody>
+              {% for term, definition in data.terms.items() %}
+              <tr>
+                <th scope="row">{{ term }}</th>
+                <td>{{ definition }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </section>
+        <section class="recommendations">
+          <h3>Recommendations</h3>
+          <ul>
+            {% for recommendation in data.recommendations %}
+            <li>{{ recommendation }}</li>
+            {% endfor %}
+          </ul>
+        </section>
+      </article>
+    </main>
+  </body>
 </html>

@@ -14,3 +14,4 @@ document.addEventListener('DOMContentLoaded', function() {
         console.error('Podcast select element not found');
     }
 });
+

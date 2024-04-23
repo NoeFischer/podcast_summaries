@@ -34,11 +34,18 @@ header {
     background-color: #f0f0f0;
     padding: 20px;
     margin-bottom: 20px;
+    height: 80px; /* Set an explicit height */
+}
+
+.header-brand, .header-brand h1 {
+    font-size: 24px;
+    margin: 0; /* Ensure no extra space from default margins */
+    line-height: 1.2; /* Adjust line height to fill header appropriately */
 }
 
 .header-brand a {
     font-weight: bold;
-    font-size: 30px;
+    font-size: 24px;
 }
 
 main {
@@ -53,9 +60,15 @@ nav form {
     gap: 10px; /* Adds space between elements in the form */
 }
 
+nav a, nav form {
+    font-size: 16px;
+    line-height: 1.2;
+}
+
 input[type="text"], select {
     padding: 5px 10px;
     font-size: 16px;
+    height: 30px;
 }
 
 button {
@@ -63,6 +76,7 @@ button {
     background-color: #f0f0f0;
     border: none;
     cursor: pointer;
+    height: 30px;
 }
 
 button:hover {
@@ -76,15 +90,19 @@ article {
     margin-bottom: 20px;
 }
 
+article section {
+    margin-bottom: 10px;
+}
+
 article h2 {
     font-size: 24px;
-    margin-bottom: 5px;
+    margin-bottom: 2px;
 }
 
 .subtitle {
     font-size: 14px;
     color: #666;
-    margin-bottom: 5px;
+    margin-bottom: 7px;
 }
 
 .tags {
@@ -93,7 +111,7 @@ article h2 {
 
 .tag {
     display: inline-block;
-    background-color: #f0f0f0;
+    background-color: #faf9f9;
     color: #333;
     font-size: 12px;
     padding: 5px 10px;
@@ -105,4 +123,41 @@ article h2 {
     content: "";
     display: table;
     clear: both;
+}
+
+.quote-carousel {
+    position: relative;
+    width: 80%;
+    margin: auto;
+    overflow: hidden;
+}
+
+.quotes-slider {
+    display: flex;
+    transition: transform 0.5s ease;
+}
+
+.quote-slide {
+    min-width: 100%;
+    box-sizing: border-box;
+    padding: 20px;
+    text-align: center;
+}
+
+.prev, .next {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: #ddd;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+}
+
+.prev {
+    left: 10px;
+}
+
+.next {
+    right: 10px;
 }

@@ -8,6 +8,10 @@
       rel="stylesheet"
       href="{{ url_for('static', filename='styles.css' ) }}"
     />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Merriweather:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
   </head>
 
   <body>
@@ -33,21 +37,23 @@
       <section id="summaries">
         {% for sum in summaries %}
         <article>
-          <h2>
-            <a href="{{ url_for('summary', summary_id=sum.metadata.id) }}"
-              >{{ sum.metadata.title }}</a
-            >
-          </h2>
-          <p class="subtitle">
-            Date: {{ sum.metadata.date }} | {{ sum.metadata.participants |
-            join(' • ') }}
-          </p>
-          <div class="tags">
+          <section class="episode-info">
+            <h2>
+              <a href="{{ url_for('summary', summary_id=sum.metadata.id) }}"
+                >{{ sum.metadata.title }}</a
+              >
+            </h2>
+            <p class="subtitle">
+              Date: {{ sum.metadata.date }} | {{ sum.metadata.participants |
+              join(' • ') }}
+            </p>
+          </section>
+          <section class="tags">
             {% for topic in sum.topics %}
             <span class="tag">{{ topic }}</span>
             {% endfor %}
-          </div>
-          <p>{{ sum.conclusions }}</p>
+          </section>
+          <section><p>{{ sum.conclusions }}</p></section>
         </article>
         {% endfor %}
       </section>
