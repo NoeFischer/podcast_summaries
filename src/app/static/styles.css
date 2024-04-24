@@ -3,12 +3,14 @@
     --secondary: #1f2d3d; /* Secondary color for the theme */
     --light: #ffffff; /* Light color for contrast */
     --hover: #DFD0B8; /* Hover color for links */
+    --grey-100: #f7f7f7;
   }
 
 .navbar {
     background-color: var(--primary); /* Use the primary color for the background */
     padding: 0.5rem 1rem; /* Adjust the padding for better spacing */
     border-bottom: 1px solid var(--light); /* Add a light border at the bottom */
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
   }
 
 /* Navbar brand styling */
@@ -86,4 +88,8 @@ body.index .card:hover {
   font-size: 0.9rem;
   font-weight: 400;
   margin-right: 0.2rem;
+}
+
+body {
+  background-color: var(--grey-100);
 }

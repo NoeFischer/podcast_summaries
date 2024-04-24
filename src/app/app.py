@@ -1,64 +1,36 @@
-import json
+# TODO: only show like 10 summaries at a time, and have a "load more" button, but the search should still work
 
-from flask import Flask, render_template, request
-from app.utils import convert_date, list_files
+from flask import Flask, abort, render_template, request
+
+from app.utils import list_files, load_summaries, load_summary_by_id, load_config
+
+
+config = load_config()
+
+SUMMARIES_DIR = config.get("SUMMARIES_DIR")
+PODCASTS = config.get("PODCASTS")
 
 app = Flask(__name__)
 
-SUMMARIES_DIR = "../../data/summaries"
-
-
-# Get all summaries
-summaries = []
-for file_name in list_files(SUMMARIES_DIR, "json"):
-    with open(file_name, "r") as file:
-        summary = json.load(file)
-        summary["metadata"]["date"] = convert_date(summary["metadata"]["date"])
-        summaries.append(summary)
-
-# sort summaries
-summaries.sort(key=lambda x: x["metadata"]["date"], reverse=True)
-
-# Get unique podcast names
-podcast_names = set(summary["metadata"]["podcast"] for summary in summaries)
-
 
 @app.route("/")
-def index():
-    # search filter
+def index() -> str:
     query = request.args.get("query")
-    if query:
-        filtered_summaries = [
-            summary
-            for summary in summaries
-            if query.lower() in summary["metadata"]["title"].lower()
-        ]
-    else:
-        filtered_summaries = summaries
-
-    # podcast filter
     podcast_filter = request.args.get("podcast")
-    if podcast_filter:
-        filtered_summaries = [
-            summary
-            for summary in filtered_summaries
-            if summary["metadata"]["podcast"] == podcast_filter
-        ]
 
+    summaries = load_summaries(list_files(SUMMARIES_DIR), query, podcast_filter)
+    podcast_names = PODCASTS
     return render_template(
-        "index.html", summaries=filtered_summaries, podcast_names=podcast_names
+        "index.html", summaries=summaries, podcast_names=podcast_names
     )
 
 
 @app.route("/summary/<summary_id>")
 def summary(summary_id):
-    data = next(
-        (summary for summary in summaries if summary["metadata"]["id"] == summary_id),
-        None,
-    )
-    if data is None:
-        return "Post not found", 404
-    return render_template("summary.html", data=data)
+    summary = load_summary_by_id(SUMMARIES_DIR, summary_id)
+    if summary is None:
+        abort(404, description="Summary not found")
+    return render_template("summary.html", data=summary)
 
 
 if __name__ == "__main__":
