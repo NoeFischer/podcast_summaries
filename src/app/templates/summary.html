@@ -45,21 +45,21 @@
             {% endfor %}
           </section>
           <section class="mb-4">
-            <h5 class="mb-2">Summary</h4>
+            <h5 class="mb-2">Summary</h5>
             <p class="card-text">{{ data.summary }}</p>
           </section>
           <section class="mb-4">
-            <h5 class="mb-2">Recommendations</h4>
+            <h5 class="mb-2">Recommendations</h5>
             <ul class="list-unstyled mb-0">
               {% for recommendation in data.recommendations %}
-              <li class="card-text py-2">
+              <li class="card-text py-1">
                 <i class="bi bi-check"></i> {{ recommendation }}
               </li>
               {% endfor %}
             </ul>
           </section>
           <section class="mb-4">
-            <h5 class="mb-2">Quotes</h4>
+            <h5 class="mb-2">Quotes</h5>
             {% for quote in data.quotes %}
             <blockquote class="bg-light mb-2 p-2 rounded">
               <p class="mb-3">{{ quote.quote }}</p>
@@ -70,7 +70,7 @@
             {% endfor %}
           </section>
           <section class="mb-3">
-            <h5 class="mb-2">Terms</h4>
+            <h5 class="mb-2">Terms</h5>
             {% for term, definition in data.terms.items() %}
             <div class="bg-light mb-2 p-2 rounded">
               <h6>
