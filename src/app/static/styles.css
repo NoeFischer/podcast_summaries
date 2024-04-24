@@ -13,7 +13,7 @@
 
 /* Navbar brand styling */
 .navbar-brand {
-    font-weight: 500; /* Bold weight for the brand */
+    font-weight: 200; /* Bold weight for the brand */
     font-size: 1.7rem; /* Larger font size for visibility */
     color: var(--light); /* Light color for contrast */
     transition: color 0.2s ease-in-out; /* Smooth transition for hover effects */
@@ -56,4 +56,34 @@ margin-bottom: 0.5rem;
 background-color: var(--hover);
 color: #ffffff;
 border-color: #ffffff;
+}
+
+/* Card Styles */
+.card {
+  border: none;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  transition: transform 0.2s ease-in-out;
+}
+
+body.index .card:hover {
+  transform: translateY(-5px);
+}
+
+.card-body {
+  padding: 1.5rem;
+}
+
+.card-title {
+  font-size: 1.5rem;
+  font-weight: 500;
+}
+
+.card-text {
+  font-size: 1.1rem;
+}
+
+.badge {
+  font-size: 0.9rem;
+  font-weight: 400;
+  margin-right: 0.2rem;
 }

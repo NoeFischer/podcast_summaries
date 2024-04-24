@@ -18,7 +18,7 @@
     />
   </head>
 
-  <body>
+  <body class="index">
     <header>
       <nav class="navbar navbar-expand-lg">
         <div class="container-fluid">
@@ -46,27 +46,29 @@
       </nav>
     </header>
 
-    <main class="container mt-4">
+    <main class="container-md mt-5">
       {% for sum in summaries %}
-      <article>
-        <section class="mb-3">
-          <h2 class="mb-1">
-            <a
-              class="text-decoration-none text-primary"
-              href="{{ url_for('summary', summary_id=sum.metadata.id) }}"
-              >{{ sum.metadata.title }}</a
-            >
-          </h2>
-          <p class="text-muted mb-2">
-            {{ sum.metadata.date }} | {% for participant in
-            sum.metadata.participants %} {{ participant }}{% if not loop.last %}
-            • {% endif %} {% endfor %}
-          </p>
-          {% for topic in sum.topics %}
-          <span class="badge bg-primary">{{ topic }}</span>
-          {% endfor %}
-        </section>
-        <section class="mb-4"><p>{{ sum.conclusions }}</p></section>
+      <article class="card mb-4">
+        <div class="card-body">
+          <section class="mb-3">
+            <h2 class="card-title mb-1">
+              <a
+                class="text-decoration-none text-primary"
+                href="{{ url_for('summary', summary_id=sum.metadata.id) }}"
+                >{{ sum.metadata.title }}</a
+              >
+            </h2>
+            <p class="card-text text-muted mb-2">
+              {{ sum.metadata.date }} | {% for participant in
+              sum.metadata.participants %} {{ participant }}{% if not loop.last
+              %} • {% endif %} {% endfor %}
+            </p>
+            {% for topic in sum.topics %}
+            <span class="mb-1 badge bg-primary">{{ topic }}</span>
+            {% endfor %}
+          </section>
+          <section class="card-text"><p>{{ sum.conclusions }}</p></section>
+        </div>
       </article>
       {% endfor %}
     </main>
