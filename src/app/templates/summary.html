@@ -61,7 +61,7 @@
           <section class="mb-4">
             <h5 class="mb-2">Quotes</h5>
             {% for quote in data.quotes %}
-            <blockquote class="bg-light mb-2 p-2 rounded">
+            <blockquote class="card-text bg-light mb-2 p-2 rounded">
               <p class="mb-3">{{ quote.quote }}</p>
               <footer class="mb-1 blockquote-footer">
                 {{ quote.speaker }}
@@ -75,13 +75,13 @@
             <div class="bg-light mb-2 p-2 rounded">
               <h6>
                 <a
-                  class="text-decoration-none text-primary"
+                  class="card-text text-decoration-none text-primary"
                   href="https://perplexity.ai/search?q={{ term }}"
                   target="_blank"
                   >{{ term }}</a
                 >
               </h6>
-              <p class="mb-1">{{ definition }}</p>
+              <p class="card-text mb-1">{{ definition }}</p>
             </div>
             {% endfor %}
           </section>

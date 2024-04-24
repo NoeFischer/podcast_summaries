@@ -1,4 +1,4 @@
 .pytest_cache
-data/
+data/transcripts/
 __pycache__/
 .DS_Store

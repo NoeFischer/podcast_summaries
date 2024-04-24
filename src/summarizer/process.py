@@ -8,8 +8,6 @@ from openai import OpenAI
 from tqdm import tqdm
 
 # TODO: unit tests for all functions
-# TODO: generate id's for summaries
-# TODO: generate podcast name
 
 BASE_DATA_DIR = "../../data"
 TRANSCRIPTS_DIR = os.path.join(BASE_DATA_DIR, "transcripts")
@@ -191,11 +189,12 @@ if not untranslated_paths:
     print("No transcripts to summarize.")
 else:
     for transcript_path in tqdm(untranslated_paths, desc="Processing Transcripts"):
+        print(f"Processing {transcript_path}...")
         transcript = read_text(transcript_path)
         chunks = split_transcript(transcript)
 
         chunk_summaries = []
-        for chunk in tqdm(chunks, desc="Summarizing Chunks"):
+        for chunk in chunks:
             chunk_prompt = prompts["user_prompt_chunks"].format(content=chunk)
             chunk_sum = generate_summary(
                 client, system_prompt, chunk_prompt, CHUNK_MODEL
@@ -220,4 +219,3 @@ else:
             SUMMARIES_DIR, os.path.basename(transcript_path).replace(".txt", ".json")
         )
         write_json(final_sum_dict, summary_path)
-        print(f"Summary saved to {summary_path}")

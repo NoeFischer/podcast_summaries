@@ -1,0 +1,46 @@
+{
+    "metadata": {
+        "title": "Shane Legg (DeepMind Founder) - 2028 AGI, New Architectures, Aligning Superhuman Models",
+        "date": "26-10-2023",
+        "participants": [
+            "Dwarkesh Patel",
+            "Shane Legg"
+        ],
+        "id": "dwarkesh_podcast_231026",
+        "podcast": "Dwarkesh Podcast"
+    },
+    "summary": "In this insightful podcast episode, Shane Legg, the founder and Chief AGI Scientist at Google DeepMind, discusses the trajectory towards achieving Artificial General Intelligence (AGI) by 2028. He highlights the necessity for new AI architectures that support superhuman capabilities and ethical alignment. Legg also emphasizes the significance of multimodality in AI systems and the dual impact of DeepMind on enhancing safety protocols alongside advancing capabilities.",
+    "topics": [
+        "AGI Progress Measurement",
+        "New Architectures for AGI",
+        "Superhuman Alignment",
+        "Impact of DeepMind on Safety and Capabilities",
+        "Multimodality in AI Models"
+    ],
+    "quotes": [
+        {
+            "quote": "AGI by its definition is about generality. It's not about doing a specific thing.",
+            "speaker": "Shane Legg"
+        },
+        {
+            "quote": "To get real creativity, you need to start searching through spaces of possibilities and find these hidden gems.",
+            "speaker": "Shane Legg"
+        },
+        {
+            "quote": "I think the next landmark that people will think back to and remember is going much more fully multimodal.",
+            "speaker": "Shane Legg"
+        }
+    ],
+    "terms": {
+        "AGI": "Artificial General Intelligence, referring to machines that can perform cognitive tasks at a human level or beyond.",
+        "Multimodality": "The ability of AI models to understand and process information from multiple modalities like text, images, and videos."
+    },
+    "recommendations": [
+        "Develop architectures that incorporate both episodic memory and System 2 thinking for AI systems.",
+        "Focus on ethics training and reasoning capabilities in AI systems to ensure alignment with human values.",
+        "Invest in multimodal capabilities to unlock new applications and understandings in AI models.",
+        "Explore new computational methods to enhance the performance and efficiency of multimodal systems.",
+        "Prioritize the development of safety measures in tandem with capabilities to ensure balanced progress in AI."
+    ],
+    "conclusions": "The discussion with Shane Legg illuminates the critical paths toward AGI, underscoring the need for innovative architectures, ethical alignment, and the integration of multimodal capabilities to steer future AI advancements responsibly."
+}

@@ -1,5 +1,16 @@
 import os
+from datetime import datetime
 from typing import List
+
+
+def convert_date(date_str):
+    try:
+        return datetime.strptime(date_str, "%d-%m-%Y").strftime("%Y-%m-%d")
+    except ValueError:
+        try:
+            return datetime.strptime(date_str, "%Y-%m-%d").strftime("%Y-%m-%d")
+        except ValueError:
+            return "Invalid date format"
 
 
 def list_files(directory_path: str, file_type: str = "txt") -> List[str]:

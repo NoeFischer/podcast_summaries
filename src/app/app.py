@@ -1,21 +1,19 @@
 import json
-from datetime import datetime
 
 from flask import Flask, render_template, request
-from utils import list_files
+from app.utils import convert_date, list_files
 
 app = Flask(__name__)
 
 SUMMARIES_DIR = "../../data/summaries"
+
 
 # Get all summaries
 summaries = []
 for file_name in list_files(SUMMARIES_DIR, "json"):
     with open(file_name, "r") as file:
         summary = json.load(file)
-        summary["metadata"]["date"] = datetime.strptime(
-            summary["metadata"]["date"], "%d-%m-%Y"
-        ).strftime("%Y-%m-%d")
+        summary["metadata"]["date"] = convert_date(summary["metadata"]["date"])
         summaries.append(summary)
 
 # sort summaries
