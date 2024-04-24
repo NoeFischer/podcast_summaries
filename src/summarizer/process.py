@@ -5,10 +5,13 @@ from typing import Any, Dict, List, Tuple
 
 import yaml
 from openai import OpenAI
+from tqdm import tqdm
 
 # TODO: unit tests for all functions
+# TODO: generate id's for summaries
+# TODO: generate podcast name
 
-BASE_DATA_DIR = "../data"
+BASE_DATA_DIR = "../../data"
 TRANSCRIPTS_DIR = os.path.join(BASE_DATA_DIR, "transcripts")
 SUMMARIES_DIR = os.path.join(BASE_DATA_DIR, "summaries")
 
@@ -139,7 +142,6 @@ def combine_summaries(chunk_summaries: List[Dict[str, Any]]) -> Dict[str, Any]:
     }
 
     for chunk_sum in chunk_summaries[1:]:
-
         for key, operation in operations.items():
             if operation == "append":
                 combined_sum[key].append(chunk_sum[key])
@@ -151,6 +153,29 @@ def combine_summaries(chunk_summaries: List[Dict[str, Any]]) -> Dict[str, Any]:
                 combined_sum["terms"][term] = description
 
     return combined_sum
+
+
+def get_metadata_from_path(transcript_path: str) -> Dict[str, str]:
+    """
+    Extract the "id" and "podcast" metadata from the transcript file path.
+
+    Args:
+        transcript_path (str): The path to the transcript file.
+
+    Returns:
+        Dict[str, str]: A dictionary containing the "id" and "podcast" metadata.
+    """
+    transcript_filename = os.path.basename(transcript_path)
+    transcript_name, _ = os.path.splitext(transcript_filename)
+    id_value = transcript_name
+
+    podcast_name_parts = transcript_name.split("_")
+    podcast_name = " ".join(podcast_name_parts[:-1]).title()
+
+    return {
+        "id": id_value,
+        "podcast": podcast_name,
+    }
 
 
 ######################### RUN SCRIPT ######################################
@@ -165,12 +190,12 @@ untranslated_paths = find_unsummarized_transcripts(TRANSCRIPTS_DIR, SUMMARIES_DI
 if not untranslated_paths:
     print("No transcripts to summarize.")
 else:
-    for transcript_path in untranslated_paths:
+    for transcript_path in tqdm(untranslated_paths, desc="Processing Transcripts"):
         transcript = read_text(transcript_path)
         chunks = split_transcript(transcript)
 
         chunk_summaries = []
-        for chunk in chunks:
+        for chunk in tqdm(chunks, desc="Summarizing Chunks"):
             chunk_prompt = prompts["user_prompt_chunks"].format(content=chunk)
             chunk_sum = generate_summary(
                 client, system_prompt, chunk_prompt, CHUNK_MODEL
@@ -188,6 +213,9 @@ else:
             client, system_prompt, user_prompt_final, FINAL_MODEL
         )
         final_sum_dict = json.loads(final_sum)
+
+        final_sum_dict["metadata"].update(get_metadata_from_path(transcript_path))
+
         summary_path = os.path.join(
             SUMMARIES_DIR, os.path.basename(transcript_path).replace(".txt", ".json")
         )

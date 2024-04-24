@@ -1,4 +1,4 @@
-system_prompt: | 
+system_prompt: |
   You are an AI practitioner and an expert in explaining concepts to a professional audience. Ensure the information is formatted in JSON based on the following JSON schema:
   {schema}
 
@@ -24,10 +24,10 @@ user_prompt_final: |
 
   Instructions:
   1. Metadata: Include the title, date (DD-MM-YYYY), and participants of the podcast.
-  2. Summary: Summarize the summaries in a single comprehensive statement. Focus on the overarching themes.
+  2. Summary: Summarize the summaries in a single comprehensive paragraph. 
   3. Topics: List the five main topics discussed. Read all the topics before picking the five most important ones.
   4. Quotes: Identify the three most important quotes. Read all the quotes before picking the three most important ones. Ensure these quotes are directly cited without paraphrasing, and include the name of the speaker for each quote.
-  5. Terms: Identify the key terms that are pivotal to understanding the discussion. Provide definitions for these terms. 
+  5. Terms: Identify the key terms that are pivotal to understanding the discussion and that are not widely known. Provide definitions for these terms. 
   6. Recommendations: List the five most critical recommendations. 
   7. Conclusions: Summarize the final conclusions in a single statement. This should reflect the implications of the discussion for future AI research and practices. 
 

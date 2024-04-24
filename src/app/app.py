@@ -52,7 +52,7 @@ def index():
     )
 
 
-@app.route("/summary/<int:summary_id>")
+@app.route("/summary/<summary_id>")
 def summary(summary_id):
     data = next(
         (summary for summary in summaries if summary["metadata"]["id"] == summary_id),
