@@ -10,8 +10,7 @@ from app.utils import (
     convert_date,
 )
 
-
-config = load_config()
+config = load_config("config.yml")
 
 SUMMARIES_DIR = config.get("SUMMARIES_DIR")
 PODCASTS = config.get("PODCASTS")

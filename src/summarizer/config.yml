@@ -1,0 +1,101 @@
+paths:
+  transcripts: "../../data/transcripts"
+  summaries: "../../data/summaries"
+
+prompts:
+  system: |
+    You are an AI practitioner and an expert in explaining concepts to a professional audience. Ensure the information is formatted in JSON based on the following JSON schema:
+    {schema}
+
+  user_chunk: |
+    Objective:
+    Given the podcast episode transcript provided, generate a structured summary in JSON format. The summary should include the sections outlined in instructions, adhering strictly to the structure and examples provided. Always read all the relevant paragraphs before summarizing or identifying key passages.
+
+    Instructions:
+    1. Metadata: Include the title, date (DD-MM-YYYY), and participants of the podcast.
+    2. Summary: A concise overview of the podcast transcript.
+    3. Topics: A list of the main topics of the discussion.
+    4. Quotes: A list of quotes that are exemplary of the discussion. Ensure these quotes are directly cited without paraphrasing, and include the name of the speaker for each quote.
+    5. Terms: Identify the key terms that are pivotal to understanding the discussion. Provide definitions for these terms.
+    6. Recommendations: A list of suggestions or advice given during the episode.
+    7. Conclusions: A summarizing statement that encapsulates the key outcomes or messages of the episode.
+
+    Here is the transcript:
+    {content}
+
+  user_combined: |
+    Objective:
+    Given the podcast episode transcript provided, generate a structured summary in JSON format. The summary should include the sections outlined in instructions, adhering strictly to the structure and examples provided. Always read all the relevant paragraphs before summarizing or identifying key passages.
+
+    Instructions:
+    1. Metadata: Include the title, date (DD-MM-YYYY), and participants of the podcast.
+    2. Summary: Summarize the summaries in a single comprehensive paragraph. 
+    3. Topics: List the five main topics discussed. Read all the topics before picking the five most important ones.
+    4. Quotes: Identify the three most important quotes. Read all the quotes before picking the three most important ones. Ensure these quotes are directly cited without paraphrasing, and include the name of the speaker for each quote.
+    5. Terms: Identify the key terms that are pivotal to understanding the discussion and that are not widely known. Provide definitions for these terms. 
+    6. Recommendations: List the five most critical recommendations. 
+    7. Conclusions: Summarize the final conclusions in a single statement. This should reflect the implications of the discussion for future AI research and practices. 
+
+    Here are the transcripts:
+    {content}
+
+schema:
+  $schema: http://json-schema.org/draft-07/schema#
+  type: object
+  properties:
+    metadata:
+      type: object
+      properties:
+        title:
+          type: string
+        date:
+          type: string
+          format: date
+        participants:
+          type: array
+          items:
+            type: string
+      required:
+        - title
+        - date
+        - participants
+    summary:
+      type: string
+    topics:
+      type: array
+      items:
+        type: string
+    quotes:
+      type: array
+      items:
+        type: object
+        properties:
+          quote:
+            type: string
+          speaker:
+            type: string
+        required:
+          - quote
+          - speaker
+    terms:
+      type: object
+      additionalProperties:
+        type: string
+    recommendations:
+      type: array
+      items:
+        type: string
+    conclusions:
+      type: string
+  required:
+    - metadata
+    - summary
+    - topics
+    - quotes
+    - terms
+    - recommendations
+    - conclusions
+
+models:
+  chunk: "gpt-3.5-turbo-0125"
+  combined: "gpt-4-turbo"

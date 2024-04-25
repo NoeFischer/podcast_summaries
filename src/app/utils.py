@@ -8,8 +8,8 @@ from typing import Any, Dict, List
 import yaml
 
 
-def load_config():
-    with open("config.yml", "r") as stream:
+def load_config(file_path: str) -> Dict[str, Any]:
+    with open(file_path, "r") as stream:
         try:
             return yaml.safe_load(stream)
         except yaml.YAMLError as e:
