@@ -1,7 +1,7 @@
 import json
 import math
 import os
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List
 
 import yaml
 from openai import OpenAI
@@ -9,8 +9,6 @@ from openai import OpenAI
 
 def list_files(directory_path: str, file_type: str = "txt") -> List[str]:
     """Retrieve and return a sorted list of filenames in a specified directory that match a given file extension."""
-    if not os.path.isdir(directory_path):
-        raise ValueError(f"Invalid directory path: {directory_path}")
     files = [
         os.path.join(directory_path, file)
         for file in os.listdir(directory_path)
@@ -65,36 +63,26 @@ def write_json(content: Any, file_path: str):
         json.dump(content, f, ensure_ascii=False, indent=4)
 
 
-def balance_splits(transcript, estimated_parts):
-    """Adjust split points to balance transcript across parts."""
-    part_starts = [0]
-    step_size = len(transcript) // estimated_parts
-    for i in range(1, estimated_parts):
-        part_end_index = part_starts[-1] + step_size
-        part_end = (
-            transcript.find("\n", part_end_index) + 1
-            if "\n" in transcript[part_end_index:]
-            else len(transcript)
-        )
-        part_starts.append(part_end)
-    part_starts.append(len(transcript))
-    return part_starts
+def split_transcript(transcript: str, max_chars: int = 56000) -> List[str]:
+    parts = []
+    start = 0
+    length = len(transcript)
 
+    while start < length:
+        end = start + max_chars
+        if end < length:
+            buffer_end = min(end + 1000, length)
+            split_index = transcript.rfind("\n", start, buffer_end)
+            if split_index == -1:
+                split_index = transcript.rfind(" ", start, buffer_end)
+            if split_index != -1 and split_index > start:
+                end = split_index + 1
+            else:
+                end = min(length, end)
+        parts.append(transcript[start:end])
+        start = end
 
-def split_transcript(transcript, max_chars=56000):
-    """Split the transcript into chunks, balancing them more evenly."""
-    estimated_parts = math.ceil(len(transcript) / max_chars)
-    part_starts = balance_splits(transcript, estimated_parts)
-    return [
-        transcript[start:end] for start, end in zip(part_starts[:-1], part_starts[1:])
-    ]
-
-
-def load_config(schema_path: str, config_path: str) -> Tuple[Any, Any]:
-    """Load configuration files for the schema and prompts."""
-    schema = read_text(schema_path)
-    config = load_yaml(config_path)
-    return schema, config
+    return parts
 
 
 def generate_summary(
