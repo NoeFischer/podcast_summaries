@@ -3,7 +3,7 @@
 import json
 import os
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 import yaml
 
@@ -34,8 +34,6 @@ def convert_date(date_str: str) -> str:
 
 def list_files(directory_path: str) -> List[str]:
     """Retrieve a list of full file paths for .json files in the specified directory."""
-    if not os.path.isdir(directory_path):
-        raise ValueError(f"Invalid directory path: {directory_path}")
     return [
         os.path.join(directory_path, file)
         for file in os.listdir(directory_path)
@@ -46,7 +44,7 @@ def list_files(directory_path: str) -> List[str]:
 def load_summaries(
     file_paths: List[str], query: str = None, podcast_filter: str = None
 ) -> List[dict[str, Any]]:
-    """Load summary files given by file_paths, convert dates, and return summaries sorted by date in descending order."""
+    """Load summary files given by file_paths and filter them by query and podcast_filter."""
     summaries = []
     for file_path in file_paths:
         with open(file_path, "r") as file:
@@ -55,18 +53,13 @@ def load_summaries(
                 continue
             if query and query.lower() not in summary["metadata"]["title"].lower():
                 continue
-            summary["metadata"]["date"] = convert_date(summary["metadata"]["date"])
             summaries.append(summary)
-    summaries.sort(key=lambda x: x["metadata"]["date"], reverse=True)
     return summaries
 
 
-def load_summary_by_id(directory_path: str, summary_id: str) -> Optional[Dict]:
+def load_summary_by_id(directory_path: str, summary_id: str) -> Dict[str, Any]:
     """Load a summary by its ID from the summaries directory."""
     file_path = os.path.join(directory_path, f"{summary_id}.json")
-    if not os.path.isfile(file_path):
-        return None
     with open(file_path, "r") as file:
         summary = json.load(file)
-        summary["metadata"]["date"] = convert_date(summary["metadata"]["date"])
         return summary
