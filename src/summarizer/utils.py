@@ -63,26 +63,31 @@ def write_json(content: Any, file_path: str):
         json.dump(content, f, ensure_ascii=False, indent=4)
 
 
-def split_transcript(transcript: str, max_chars: int = 56000) -> List[str]:
-    parts = []
+def split_transcript(transcript: str, max_chars: int = 56000) -> list:
+    chunks = []
     start = 0
     length = len(transcript)
 
+    delimiters = ["\n\n", ". ", " "]
+    buffer_size = min(1000, int(max_chars * 0.1))
+
     while start < length:
         end = start + max_chars
+        buffer_end = min(length, end + buffer_size)
+
         if end < length:
-            buffer_end = min(end + 1000, length)
-            split_index = transcript.rfind("\n", start, buffer_end)
+            split_index = -1
+            for delimiter in delimiters:
+                split_index = transcript.rfind(delimiter, start, buffer_end)
+                if split_index != -1:
+                    end = split_index + 1 if delimiter == " " else split_index + 2
+                    break
             if split_index == -1:
-                split_index = transcript.rfind(" ", start, buffer_end)
-            if split_index != -1 and split_index > start:
-                end = split_index + 1
-            else:
-                end = min(length, end)
-        parts.append(transcript[start:end])
+                end = start + max_chars
+        chunks.append(transcript[start:end])
         start = end
 
-    return parts
+    return chunks
 
 
 def generate_summary(

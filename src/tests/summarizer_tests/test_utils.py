@@ -10,6 +10,7 @@ from summarizer.utils import (
     load_yaml,
     read_text,
     write_json,
+    split_transcript,
 )
 
 
@@ -127,3 +128,24 @@ def test_write_json():
             mock_json_dump.assert_called_once_with(
                 content, mock_file.return_value, ensure_ascii=False, indent=4
             )
+
+
+@pytest.mark.parametrize(
+    "transcript, max_chars",
+    [
+        ("", 56000),
+        ("First paragraph.\n\nSecond paragraph.\n\nThird paragraph.", 20),
+        ("Sentence one. Sentence two. Sentence three.", 25),
+        ("Long paragraph without any breaks" * 10, 50),
+        ("Paragraph with a very-long-word-" + "a" * 100 + " included.", 100),
+    ],
+)
+def test_split_transcript(transcript, max_chars):
+    result = split_transcript(transcript, max_chars)
+    for chunk in result:
+        assert len(chunk) <= max_chars + 1000, f"Too long: {len(chunk)}"
+    if transcript:
+        expected_chunks = max(1, len(transcript) // max_chars)
+        assert (
+            len(result) >= expected_chunks
+        ), f"Expected min. {expected_chunks} chunks, got {len(result)}"
