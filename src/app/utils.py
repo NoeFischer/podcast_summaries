@@ -1,11 +1,11 @@
 # TODO: Implement logging -> replace print statements with logging
 
 import json
-import os
 from datetime import datetime
 from typing import Any, Dict, List
 
 import yaml
+from google.cloud import storage
 
 
 def load_config(file_path: str) -> Dict[str, Any]:
@@ -32,34 +32,49 @@ def convert_date(date_str: str) -> str:
             return date_str
 
 
-def list_files(directory_path: str) -> List[str]:
-    """Retrieve a list of full file paths for .json files in the specified directory."""
-    return [
-        os.path.join(directory_path, file)
-        for file in os.listdir(directory_path)
-        if file.endswith(".json")
+def list_files(bucket_name: str, prefix: str) -> List[str]:
+    """List files in a Google Cloud Storage bucket with a given prefix."""
+    storage_client = storage.Client()
+    bucket = storage_client.bucket(bucket_name)
+    files = [
+        blob.name
+        for blob in bucket.list_blobs(prefix=prefix)
+        if blob.name.endswith(".json")
     ]
+    return files
 
 
 def load_summaries(
-    file_paths: List[str], query: str = None, podcast_filter: str = None
-) -> List[dict[str, Any]]:
-    """Load summary files given by file_paths and filter them by query and podcast_filter."""
+    bucket_name: str,
+    file_paths: List[str],
+    query: str = None,
+    podcast_filter: str = None,
+) -> List[Dict[str, Any]]:
+    """Load summaries from a Google Cloud Storage bucket."""
+    storage_client = storage.Client()
+    bucket = storage_client.bucket(bucket_name)
     summaries = []
     for file_path in file_paths:
-        with open(file_path, "r") as file:
-            summary = json.load(file)
-            if podcast_filter and summary["metadata"]["podcast"] != podcast_filter:
-                continue
-            if query and query.lower() not in summary["metadata"]["title"].lower():
-                continue
-            summaries.append(summary)
+        blob = bucket.blob(file_path)
+        summary = json.loads(blob.download_as_text())
+        if podcast_filter and summary["metadata"]["podcast"] != podcast_filter:
+            continue
+        if query and query.lower() not in summary["metadata"]["title"].lower():
+            continue
+        summaries.append(summary)
     return summaries
 
 
-def load_summary_by_id(directory_path: str, summary_id: str) -> Dict[str, Any]:
-    """Load a summary by its ID from the summaries directory."""
-    file_path = os.path.join(directory_path, f"{summary_id}.json")
-    with open(file_path, "r") as file:
-        summary = json.load(file)
-        return summary
+def load_summary_by_id(bucket_name: str, summary_id: str) -> Dict[str, Any]:
+    """Load a summary by its ID from Google Cloud Storage within the specified bucket and prefix."""
+    if not summary_id:
+        raise ValueError("Invalid summary ID provided")
+
+    client = storage.Client()
+    bucket = client.get_bucket(bucket_name)
+    file_name = f"summaries/{summary_id}.json"
+    blob = bucket.blob(file_name)
+
+    json_data = blob.download_as_text()
+    summary = json.loads(json_data)
+    return summary

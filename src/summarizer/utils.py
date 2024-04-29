@@ -1,5 +1,4 @@
 import json
-import math
 import os
 from typing import Any, Dict, List
 
@@ -108,7 +107,7 @@ def generate_summary(
 
 
 def combine_summaries(chunk_summaries: List[Dict[str, Any]]) -> Dict[str, Any]:
-    """Combines summaries from multiple chunks into a single summary file."""
+    """Combines summaries from multiple chunks into a single dict."""
     combined_sum = chunk_summaries[0]
 
     for key in ["summary", "conclusions"]:
@@ -137,15 +136,7 @@ def combine_summaries(chunk_summaries: List[Dict[str, Any]]) -> Dict[str, Any]:
 
 
 def get_metadata_from_path(transcript_path: str) -> Dict[str, str]:
-    """
-    Extract the "id" and "podcast" metadata from the transcript file path.
-
-    Args:
-        transcript_path (str): The path to the transcript file.
-
-    Returns:
-        Dict[str, str]: A dictionary containing the "id" and "podcast" metadata.
-    """
+    """Extract the "id" and "podcast" metadata from the transcript file path."""
     transcript_filename = os.path.basename(transcript_path)
     transcript_name, _ = os.path.splitext(transcript_filename)
     id_value = transcript_name

@@ -2,6 +2,7 @@
 
 from flask import Flask, abort, render_template, request
 
+
 from app.utils import (
     list_files,
     load_summaries,
@@ -12,8 +13,10 @@ from app.utils import (
 
 config = load_config("config.yml")
 
-SUMMARIES_DIR = config.get("SUMMARIES_DIR")
+BUCKET_NAME = config.get("BUCKET_NAME")
+SUMMARIES_PREFIX = config.get("SUMMARIES_DIR")
 PODCASTS = config.get("PODCASTS")
+
 
 app = Flask(__name__)
 
@@ -23,7 +26,8 @@ def index() -> str:
     query = request.args.get("query")
     podcast_filter = request.args.get("podcast")
 
-    summaries = load_summaries(list_files(SUMMARIES_DIR), query, podcast_filter)
+    file_paths = list_files(BUCKET_NAME, SUMMARIES_PREFIX)
+    summaries = load_summaries(BUCKET_NAME, file_paths, query, podcast_filter)
 
     for summary in summaries:
         summary["metadata"]["date"] = convert_date(summary["metadata"]["date"])
@@ -38,7 +42,7 @@ def index() -> str:
 
 @app.route("/summary/<summary_id>")
 def summary(summary_id):
-    summary = load_summary_by_id(SUMMARIES_DIR, summary_id)
+    summary = load_summary_by_id(bucket_name=BUCKET_NAME, summary_id=summary_id)
     summary["metadata"]["date"] = convert_date(summary["metadata"]["date"])
 
     if summary is None:

@@ -1,4 +1,5 @@
-SUMMARIES_DIR: "../../data/summaries"
+SUMMARIES_PREFIX: "summaries"
 PODCASTS:
   - "Dwarkesh Podcast"
   - "Latent Space"
+BUCKET_NAME: "ai-podcast-cards"
