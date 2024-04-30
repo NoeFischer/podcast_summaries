@@ -3,6 +3,7 @@ import os
 from typing import Any, Dict, List
 
 import yaml
+from google.cloud import storage
 from openai import OpenAI
 
 
@@ -16,21 +17,31 @@ def list_files(directory_path: str, file_type: str = "txt") -> List[str]:
     return sorted(files)
 
 
+def list_files_gcs(bucket_name: str, prefix: str) -> List[str]:
+    """List all files in a GCS bucket folder specified by prefix."""
+    storage_client = storage.Client()
+    blobs = storage_client.list_blobs(bucket_name, prefix=prefix)
+    files = [blob.name for blob in blobs]
+    return files
+
+
 def find_unsummarized_transcripts(
-    transcripts_dir: str, summaries_dir: str
+    transcripts_dir: str, bucket_name: str, gcs_summary_folder: str
 ) -> List[str]:
     transcript_files = list_files(transcripts_dir, "txt")
-    summary_files = list_files(summaries_dir, "json")
+    summary_files = list_files_gcs(bucket_name, prefix=gcs_summary_folder)
 
     transcript_base_names = set(
         os.path.splitext(os.path.basename(file))[0] for file in transcript_files
     )
     summary_base_names = set(
-        os.path.splitext(os.path.basename(file))[0] for file in summary_files
+        os.path.splitext(os.path.basename(file).replace(gcs_summary_folder + "/", ""))[
+            0
+        ]
+        for file in summary_files
     )
 
     untranslated = transcript_base_names - summary_base_names
-
     untranslated_paths = [
         os.path.join(transcripts_dir, base_name + ".txt") for base_name in untranslated
     ]
@@ -56,10 +67,15 @@ def read_text(file_path: str) -> str:
         return file.read()
 
 
-def write_json(content: Any, file_path: str):
-    """Writes the provided content to a JSON file at the specified file path."""
-    with open(file_path, "w", encoding="utf-8") as f:
-        json.dump(content, f, ensure_ascii=False, indent=4)
+def write_json_to_gcs(content: Any, bucket_name: str, file_path: str):
+    """Writes the provided content to a JSON file in Google Cloud Storage."""
+    storage_client = storage.Client()
+    bucket = storage_client.bucket(bucket_name)
+    blob = bucket.blob(file_path)
+
+    json_content = json.dumps(content, ensure_ascii=False, indent=4)
+
+    blob.upload_from_string(json_content, content_type="application/json")
 
 
 def split_transcript(transcript: str, max_chars: int = 56000) -> list:

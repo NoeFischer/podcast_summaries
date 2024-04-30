@@ -1,6 +1,7 @@
 paths:
   transcripts: "../../data/transcripts"
-  summaries: "../../data/summaries"
+  summaries: "summaries/"
+  bucket_name: "ai-podcast-cards"
 
 prompts:
   system: |

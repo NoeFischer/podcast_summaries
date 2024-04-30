@@ -12,7 +12,7 @@ from utils import (
     load_yaml,
     read_text,
     split_transcript,
-    write_json,
+    write_json_to_gcs,
 )
 
 
@@ -22,6 +22,7 @@ if __name__ == "__main__":
 
     TRANSCRIPTS_DIR = config["paths"]["transcripts"]
     SUMMARIES_DIR = config["paths"]["summaries"]
+    BUCKET_NAME = config["paths"]["bucket_name"]
 
     CHUNK_MODEL = config["models"]["chunk"]
     COMBINED_MODEL = config["models"]["combined"]
@@ -33,8 +34,10 @@ if __name__ == "__main__":
     schema = json.dumps(config["schema"], indent=4)
     system_prompt = config["prompts"]["system"].format(schema=schema)
 
-    # Find untranslated transcripts
-    untranslated_paths = find_unsummarized_transcripts(TRANSCRIPTS_DIR, SUMMARIES_DIR)
+    # Find transcripts that have not been summarized
+    untranslated_paths = find_unsummarized_transcripts(
+        TRANSCRIPTS_DIR, BUCKET_NAME, SUMMARIES_DIR
+    )
 
     # Process transcripts
     if not untranslated_paths:
@@ -72,9 +75,6 @@ if __name__ == "__main__":
             final_sum_dict = json.loads(final_sum)
             final_sum_dict["metadata"].update(get_metadata_from_path(transcript_path))
 
-            # write final summary to file
-            summary_path = os.path.join(
-                SUMMARIES_DIR,
-                os.path.basename(transcript_path).replace(".txt", ".json"),
-            )
-            write_json(final_sum_dict, summary_path)
+            # Write final summary to Google Cloud Storage
+            summary_file_path = f"{SUMMARIES_DIR}{os.path.basename(transcript_path).replace('.txt', '.json')}"
+            write_json_to_gcs(final_sum_dict, "ai-podcast-cards", summary_file_path)
