@@ -93,3 +93,36 @@ body.index .card:hover {
 body {
   background-color: var(--grey-100);
 }
+
+/* Pagination Styles */
+.pagination {
+  display: flex;
+  justify-content: center; /* Centers the pagination horizontally */
+  list-style-type: none; /* Removes default list styling */
+  padding: 0; /* Removes default padding */
+}
+
+.pagination .page-item {
+  margin: 0 0.5rem; /* Adds space between buttons */
+}
+
+.pagination .page-link {
+  color: var(--light); /* White text color */
+  background-color: var(--secondary); /* Secondary color background */
+  border-radius: 5px; /* Rounded corners */
+  border: none; /* Removes default border */
+  padding: 0.5rem 1rem; /* Padding inside the button */
+  transition: background-color 0.2s, color 0.2s; /* Smooth transition for hover effects */
+}
+
+.pagination .page-item.active .page-link {
+  background-color: var(--hover); /* Use the secondary color for the active page */
+  color: var(--light); /* Ensures text color is white for better contrast */
+  font-weight: normal; /* Keeping font weight normal, as bold is not preferred */
+}
+
+.pagination .page-link:hover {
+  background-color: var(--hover); /* Hover effect uses the hover color */
+  color: var(--light); /* Ensures text color is white when hovered */
+  text-decoration: none; /* Removes underline on hover */
+}

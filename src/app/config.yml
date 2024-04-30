@@ -1,5 +1,5 @@
-SUMMARIES_PREFIX: "summaries"
-PODCASTS:
+summaries_prefix: "summaries/"
+podcasts:
   - "Dwarkesh Podcast"
   - "Latent Space"
-BUCKET_NAME: "ai-podcast-cards"
+bucket_name: "ai-podcast-cards"
