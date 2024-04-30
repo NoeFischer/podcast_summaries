@@ -1,35 +1,25 @@
-# TODO: only show like 10 summaries at a time, and have a "load more" button, but the search should still work
+from flask import Blueprint, render_template, request, abort, current_app, g
+from app.utils import list_files, load_summaries, load_summary_by_id, convert_date
 
-from flask import Flask, abort, render_template, request
-
-
-from app.utils import (
-    list_files,
-    load_summaries,
-    load_summary_by_id,
-    load_config,
-    convert_date,
-)
-
-config = load_config("config.yml")
-
-BUCKET_NAME = config.get("bucket_name")
-SUMMARIES_PREFIX = config.get("summaries_prefix")
-PODCASTS = config.get("podcasts")
+main = Blueprint("main", __name__)
 
 
-app = Flask(__name__)
+@main.before_request
+def load_config():
+    g.bucket_name = current_app.config["BUCKET_NAME"]
+    g.sum_prefix = current_app.config["SUM_PREFIX"]
+    g.podcasts = current_app.config["PODCASTS"]
 
 
-@app.route("/")
+@main.route("/")
 def index():
     query = request.args.get("query", "")
     podcast_filter = request.args.get("podcast", "")
     page = int(request.args.get("page", 1))
     per_page = 10
 
-    file_paths = list_files(BUCKET_NAME, SUMMARIES_PREFIX)
-    all_summaries = load_summaries(BUCKET_NAME, file_paths)
+    file_paths = list_files(g.bucket_name, g.sum_prefix)
+    all_summaries = load_summaries(g.bucket_name, file_paths)
 
     filtered_summaries = [
         summary
@@ -47,11 +37,10 @@ def index():
     total_pages = (total_summaries + per_page - 1) // per_page
     displayed_summaries = filtered_summaries[(page - 1) * per_page : page * per_page]
 
-    podcast_names = PODCASTS
     return render_template(
         "index.html",
         summaries=displayed_summaries,
-        podcast_names=podcast_names,
+        podcast_names=g.podcasts,
         total_pages=total_pages,
         current_page=page,
         query=query,
@@ -59,15 +48,15 @@ def index():
     )
 
 
-@app.route("/summary/<summary_id>")
+@main.route("/summary/<summary_id>")
 def summary(summary_id):
-    summary = load_summary_by_id(BUCKET_NAME, SUMMARIES_PREFIX, summary_id)
+    summary = load_summary_by_id(
+        g.bucket_name,
+        g.sum_prefix,
+        summary_id,
+    )
     summary["metadata"]["date"] = convert_date(summary["metadata"]["date"])
 
     if summary is None:
         abort(404, description="Summary not found")
     return render_template("summary.html", data=summary)
-
-
-if __name__ == "__main__":
-    app.run()

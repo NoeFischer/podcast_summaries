@@ -1,5 +1,3 @@
-# TODO: Implement logging -> replace print statements with logging
-
 import json
 from datetime import datetime
 from typing import Any, Dict, List
