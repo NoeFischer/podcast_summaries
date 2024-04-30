@@ -2,17 +2,7 @@ import json
 from datetime import datetime
 from typing import Any, Dict, List
 
-import yaml
 from google.cloud import storage
-
-
-def load_config(file_path: str) -> Dict[str, Any]:
-    with open(file_path, "r") as stream:
-        try:
-            return yaml.safe_load(stream)
-        except yaml.YAMLError as e:
-            print(e)
-            return {}
 
 
 def convert_date(date_str: str) -> str:
@@ -32,8 +22,7 @@ def convert_date(date_str: str) -> str:
 
 def list_files(bucket_name: str, prefix: str) -> List[str]:
     """List files in a Google Cloud Storage bucket with a given prefix."""
-    storage_client = storage.Client()
-    bucket = storage_client.bucket(bucket_name)
+    bucket = storage.Client().bucket(bucket_name)
     files = [
         blob.name
         for blob in bucket.list_blobs(prefix=prefix)
@@ -42,9 +31,8 @@ def list_files(bucket_name: str, prefix: str) -> List[str]:
     return files
 
 
-def load_summaries(bucket_name, file_paths):
-    storage_client = storage.Client()
-    bucket = storage_client.bucket(bucket_name)
+def load_summaries(bucket_name: str, file_paths: List[str]) -> List[Dict[str, Any]]:
+    bucket = storage.Client().bucket(bucket_name)
     summaries = []
 
     for file_path in file_paths:
@@ -59,14 +47,5 @@ def load_summary_by_id(
     bucket_name: str, prefix: str, summary_id: str
 ) -> Dict[str, Any]:
     """Load a summary by its ID from Google Cloud Storage within the specified bucket and prefix."""
-    if not summary_id:
-        raise ValueError("Invalid summary ID provided")
-
-    client = storage.Client()
-    bucket = client.get_bucket(bucket_name)
-    file_name = f"{prefix}{summary_id}.json"
-    blob = bucket.blob(file_name)
-
-    json_data = blob.download_as_text()
-    summary = json.loads(json_data)
-    return summary
+    blob = storage.Client().bucket(bucket_name).blob(f"{prefix}{summary_id}.json")
+    return json.loads(blob.download_as_text())
