@@ -63,13 +63,11 @@ def test_list_files(MockClient, config, blobs, expected):
 @pytest.mark.parametrize(
     "file_paths, input_summaries, expected_summaries",
     [
-        # Test Case: One file path; one summary
         (
             ["summaries/summary1.json"],
             ['{"summary": "Summary Podcast 1"}'],
             [{"summary": "Summary Podcast 1"}],
         ),
-        # Test Case: Multiple file paths; multiple summaries
         (
             ["summaries/summary1.json", "summaries/summary2.json"],
             ['{"summary": "Summary Podcast 1"}', '{"summary": "Summary Podcast 2"}'],

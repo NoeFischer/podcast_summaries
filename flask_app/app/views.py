@@ -55,8 +55,9 @@ def summary(summary_id):
         g.sum_prefix,
         summary_id,
     )
-    summary["metadata"]["date"] = convert_date(summary["metadata"]["date"])
-
     if summary is None:
         abort(404, description="Summary not found")
+    else:
+        summary["metadata"]["date"] = convert_date(summary["metadata"]["date"])
+
     return render_template("summary.html", data=summary)
