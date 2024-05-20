@@ -107,7 +107,7 @@ def split_transcript(transcript: str, max_chars: int = 56000) -> list:
 
 def generate_summary(
     client: OpenAI, system_prompt: str, user_prompt: str, model: str
-) -> str:
+) -> str | None:
     """Generates a summary based on system and user prompts using the specified OpenAI model."""
     response = client.chat.completions.create(
         model=model,
